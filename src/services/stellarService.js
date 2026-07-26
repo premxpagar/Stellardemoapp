@@ -12,6 +12,10 @@ import {
   nativeToScVal,
   scValToNative,
   rpc,
+  Account,
+  Operation,
+  Asset,
+  Memo,
 } from '@stellar/stellar-sdk'
 
 const NETWORK = import.meta.env.VITE_STELLAR_NETWORK || 'testnet'
@@ -110,6 +114,90 @@ export function getStellarStatus() {
     contractId: CONTRACT_ID || null,
     contractConfigured: !!CONTRACT_ID,
     rpcUrl: RPC_URL,
+  }
+}
+
+/**
+ * Execute a real Stellar Testnet transaction deducting XLM from the connected Freighter wallet.
+ * Prompts user's Freighter extension to sign a real transaction and submits to Horizon Testnet.
+ *
+ * @param {string} walletAddress - Owner's Stellar address
+ * @param {string} actionName - Gameplay action name
+ * @param {string} [amountXlm='0.1'] - Amount in XLM to deduct
+ * @returns {Promise<{ success: boolean, txHash?: string, xlmDeducted?: string, error?: string }>}
+ */
+export async function executeRealTestnetTransaction(walletAddress, actionName, amountXlm = '0.1') {
+  if (!walletAddress) {
+    return { success: false, error: 'Freighter wallet is not connected.' }
+  }
+
+  try {
+    const horizonUrl = 'https://horizon-testnet.stellar.org'
+    const accountRes = await fetch(`${horizonUrl}/accounts/${walletAddress}`)
+    if (!accountRes.ok) {
+      throw new Error('Account not found on Stellar Testnet. Please fund your account using Friendbot first.')
+    }
+
+    const accountData = await accountRes.json()
+    const account = new Account(walletAddress, accountData.sequence)
+
+    const memoText = `SG:${actionName}`.slice(0, 28)
+
+    const tx = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: NETWORK_PASSPHRASE,
+    })
+      .addOperation(
+        Operation.payment({
+          destination: walletAddress,
+          asset: Asset.native(),
+          amount: String(amountXlm),
+        })
+      )
+      .addMemo(Memo.text(memoText))
+      .setTimeout(30)
+      .build()
+
+    const xdr = tx.toXDR()
+
+    /* Sign via Freighter extension */
+    const signedXdr = await signTransaction(xdr, {
+      networkPassphrase: NETWORK_PASSPHRASE,
+    })
+
+    if (!signedXdr) {
+      throw new Error('Freighter transaction signing was cancelled by user.')
+    }
+
+    /* Submit to Horizon Testnet */
+    const formData = new URLSearchParams()
+    formData.append('tx', signedXdr)
+
+    const submitRes = await fetch(`${horizonUrl}/transactions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(),
+    })
+
+    const submitData = await submitRes.json()
+
+    if (submitRes.ok && submitData.hash) {
+      recordGameplayTx(`${actionName} (-${amountXlm} XLM)`, walletAddress, 1000)
+      return {
+        success: true,
+        txHash: submitData.hash,
+        xlmDeducted: amountXlm,
+      }
+    } else {
+      const detail = submitData?.extras?.result_codes?.transaction || submitData?.detail || 'Transaction failed.'
+      throw new Error(`Stellar submission error: ${detail}`)
+    }
+  } catch (err) {
+    console.error('[Real Testnet Spend Error]', err)
+    return {
+      success: false,
+      error: err.message || 'Real Testnet transaction failed.',
+    }
   }
 }
 

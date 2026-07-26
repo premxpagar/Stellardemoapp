@@ -305,7 +305,7 @@ function App() {
         {screen === 'fusion' && <Starweave game={game} picks={fusionPick} setPicks={setFusionPick} stage={fusionStage} onFuse={fuse} onWelcome={() => { setFusionStage('idle'); setFusionPick([]); setScreen('companions') }} />}
         {screen === 'wardrobe' && <Wardrobe selected={selected} equipped={equipped} game={game} onItem={buyOrEquip} />}
         {screen === 'inventory' && <Inventory game={game} />}
-        {screen === 'gate' && <AstralGate onEnter={enterKnightMode} game={game} />}
+        {screen === 'gate' && <AstralGate onEnter={enterKnightMode} game={game} wallet={wallet} />}
         {screen === 'leaderboard' && <Leaderboard game={game} />}
         {screen === 'profile' && <PlayerProfile game={game} wallet={wallet?.truncated || ''} />}
       </section>
