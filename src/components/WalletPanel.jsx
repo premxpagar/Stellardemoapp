@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { getTestnetSpendingStats } from '../services/stellarService'
 import './WalletPanel.css'
 
 const HORIZON_TESTNET = 'https://horizon-testnet.stellar.org'
@@ -13,6 +14,7 @@ export default function WalletPanel({ wallet, onConnect, onDisconnect }) {
   const [showDetails, setShowDetails] = useState(false)
   const [latestLedger, setLatestLedger] = useState(null)
   const [recentTxs, setRecentTxs] = useState([])
+  const [spending, setSpending] = useState(getTestnetSpendingStats())
 
   const fullAddress = wallet?.full || ''
   const truncated = wallet?.truncated || ''
@@ -42,6 +44,7 @@ export default function WalletPanel({ wallet, onConnect, onDisconnect }) {
 
   /* Fetch live Stellar Testnet ledger sequence & transactions */
   const fetchLiveNetworkData = useCallback(async () => {
+    setSpending(getTestnetSpendingStats())
     try {
       const ledgerRes = await fetch(`${HORIZON_TESTNET}/ledgers?order=desc&limit=1`)
       if (ledgerRes.ok) {
@@ -74,7 +77,7 @@ export default function WalletPanel({ wallet, onConnect, onDisconnect }) {
       fetchBalance()
       fetchLiveNetworkData()
     }
-    const interval = setInterval(fetchLiveNetworkData, 10000)
+    const interval = setInterval(fetchLiveNetworkData, 3000)
     return () => clearInterval(interval)
   }, [fullAddress, fetchBalance, fetchLiveNetworkData])
 
@@ -180,6 +183,25 @@ export default function WalletPanel({ wallet, onConnect, onDisconnect }) {
         )}
       </div>
 
+      {/* Real-time Gameplay Spending Tracker */}
+      <div style={{
+        margin: '8px 0',
+        background: 'rgba(156, 232, 255, 0.08)',
+        border: '1px solid rgba(156, 232, 255, 0.2)',
+        borderRadius: '8px',
+        padding: '6px 10px',
+        fontSize: '0.75rem',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', color: '#9ce8ff' }}>
+          <span>⚡ Real-Time Testnet Fee</span>
+          <span>{spending.totalXlm} XLM</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.8, marginTop: '2px' }}>
+          <span>Gameplay Actions</span>
+          <span>{spending.txCount} txs recorded</span>
+        </div>
+      </div>
+
       {/* Fund with Friendbot */}
       <button
         className={`wp-fund ${funding ? 'wp-funding' : ''}`}
@@ -201,32 +223,24 @@ export default function WalletPanel({ wallet, onConnect, onDisconnect }) {
         </div>
       )}
 
-      {/* Live Transaction Monitor */}
-      {recentTxs.length > 0 && (
+      {/* Live Session Activity Feed */}
+      {spending.history.length > 0 && (
         <div style={{
           marginTop: '10px',
-          background: 'rgba(255, 255, 255, 0.04)',
+          background: 'rgba(0, 0, 0, 0.25)',
           borderRadius: '6px',
           padding: '8px',
-          fontSize: '0.75rem',
+          fontSize: '0.72rem',
+          maxHeight: '80px',
+          overflowY: 'auto',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.7, marginBottom: '4px' }}>
-            <span>Live Testnet Txs</span>
-            <span>{recentTxs.length} recent</span>
+          <div style={{ opacity: 0.7, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            Recent Gameplay Spending
           </div>
-          {recentTxs.slice(0, 2).map((tx) => (
-            <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0' }}>
-              <a
-                href={`https://stellar.expert/explorer/testnet/tx/${tx.hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#9ce8ff', textDecoration: 'none', fontFamily: 'monospace' }}
-              >
-                {tx.hash.slice(0, 6)}…{tx.hash.slice(-4)}
-              </a>
-              <span style={{ color: tx.successful ? '#8df4a4' : '#ff8b8b' }}>
-                {tx.successful ? '✓ Success' : '✕ Failed'}
-              </span>
+          {spending.history.slice(0, 3).map((item) => (
+            <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0' }}>
+              <span style={{ color: '#e2e8f0' }}>{item.action}</span>
+              <span style={{ color: '#8df4a4', fontFamily: 'monospace' }}>-{item.xlmFee}</span>
             </div>
           ))}
         </div>

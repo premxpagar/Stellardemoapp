@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { isConnected, requestAccess } from '@stellar/freighter-api'
-import { registerCompanionOnChain, connectWallet as connectWalletFromService } from './services/stellarService'
+import { registerCompanionOnChain, connectWallet as connectWalletFromService, recordGameplayTx } from './services/stellarService'
 import { syncProfileToSupabase } from './services/supabase'
 import { achievementList, companions as starterCompanions, cosmetics, fusionReward, xpForLevel } from './game/data'
 import { applyEnergyRegen, clearSave, loadSave, saveGame } from './game/save'
@@ -56,14 +56,30 @@ function App() {
     const day = new Date().toDateString()
     if (game.claimedDaily === day) return setNotice('The moonflower will bloom again tomorrow.')
     updateGame((s) => ({ ...s, claimedDaily: day, stardust: s.stardust + 35, stats: { ...s.stats, stardustEarned: s.stats.stardustEarned + 35 } }))
-    setNotice('Daily moonflower reward: 35 Stardust!'); setToast('Daily reward collected +35 ✦')
+    if (wallet?.full) {
+      const tx = recordGameplayTx('Claim Daily Reward', wallet.full)
+      if (tx) setToast(`Daily reward collected +35 ✦ (Testnet Fee: ${tx.xlmFee})`)
+    } else {
+      setToast('Daily reward collected +35 ✦')
+    }
+    setNotice('Daily moonflower reward: 35 Stardust!')
   }
   const interact = (name, reward, text) => {
     const now = Date.now(); if ((game.objectCooldowns?.[name] || 0) > now) return setNotice(`${name} is resting. Try again in a minute.`)
     updateGame((s) => ({ ...s, stardust: s.stardust + reward, stats: { ...s.stats, stardustEarned: s.stats.stardustEarned + reward }, objectCooldowns: { ...s.objectCooldowns, [name]: now + 60000 } }))
+    if (wallet?.full) {
+      recordGameplayTx(`Interact: ${name}`, wallet.full)
+    }
     setNotice(text); setToast(`+${reward} Stardust`)
   }
-  const rest = () => { updateGame((s) => ({ ...s, companions: s.companions.map((c) => c.id === selected.id ? { ...c, energy: Math.min(100, c.energy + 28) } : c) })); setNotice(`${selected.name} had a cozy rest and recovered energy.`) }
+  const rest = () => {
+    updateGame((s) => ({ ...s, companions: s.companions.map((c) => c.id === selected.id ? { ...c, energy: Math.min(100, c.energy + 28) } : c) }))
+    if (wallet?.full) {
+      const tx = recordGameplayTx(`Rest ${selected.name}`, wallet.full)
+      if (tx) setToast(`${selected.name} rested ✦ (Testnet Fee: ${tx.xlmFee})`)
+    }
+    setNotice(`${selected.name} had a cozy rest and recovered energy.`)
+  }
   const beginExplore = () => { if (selected.energy < 15) return setNotice(`${selected.name} is too tired. Let them rest first.`); setExploring(true); setResults(null) }
   const finishExplore = (outcome) => {
     setExploring(false); setResults(outcome)
@@ -79,18 +95,28 @@ function App() {
       while (playerXp >= xpForLevel(playerLevel)) { playerXp -= xpForLevel(playerLevel); playerLevel += 1 }
       return { ...s, companions: nextCompanions, stardust: s.stardust + outcome.stardust, playerXp, playerLevel, stats: { ...s.stats, explorations: s.stats.explorations + 1, stardustEarned: s.stats.stardustEarned + outcome.stardust, goldStars: s.stats.goldStars + outcome.gold } }
     })
+    if (wallet?.full) {
+      recordGameplayTx('Complete Meadow Expedition', wallet.full)
+    }
     setNotice(`${selected.name}: ${random(['That was brilliant!', 'The meadow sparkled for us!', 'I want to go again soon!'])}`)
   }
   const buyOrEquip = (item) => {
     const owns = game.unlockedCosmetics.includes(item.id)
     if (!owns && game.stardust < item.price) return setNotice(`You need ${item.price - game.stardust} more Stardust for ${item.name}.`)
     updateGame((s) => ({ ...s, stardust: owns ? s.stardust : s.stardust - item.price, unlockedCosmetics: owns ? s.unlockedCosmetics : [...s.unlockedCosmetics, item.id], equipped: { ...s.equipped, [selected.id]: s.equipped[selected.id] === item.id ? undefined : item.id } }))
+    if (!owns && wallet?.full) {
+      const tx = recordGameplayTx(`Adornment: ${item.name}`, wallet.full)
+      if (tx) setToast(`Purchased ${item.name} ✦ (Testnet Fee: ${tx.xlmFee})`)
+    }
     setNotice(owns && equipped === item.id ? `${selected.name} put the ${item.name} away.` : `${selected.name} loves the ${item.name}!`)
   }
   const fuse = () => {
     if (fusionPick.length !== 2) return setNotice('Choose two different companions to begin Starweave.')
     if (game.companions.some((c) => c.id === 'aster')) return setNotice('Aster has already joined your grove.')
     setFusionStage('weaving')
+    if (wallet?.full) {
+      recordGameplayTx('Starweave Companion Fusion', wallet.full)
+    }
     setTimeout(() => { updateGame((s) => ({ ...s, companions: [...s.companions.filter((c) => !fusionPick.includes(c.id)), fusionReward], selectedId: 'aster', stats: { ...s.stats, fusions: s.stats.fusions + 1 } })); setFusionStage('reveal'); setNotice('Aster: I was born from a wish!') }, 1700)
   }
   const connectWallet = async () => {

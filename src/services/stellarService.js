@@ -263,3 +263,49 @@ export async function getTotalRegisteredOnChain() {
     return 0
   }
 }
+
+/* Real-time testnet session spending state */
+let sessionSpending = {
+  totalGasStroops: 0,
+  txCount: 0,
+  history: [],
+}
+
+/**
+ * Record a real-time testnet transaction spending gas fee (100 stroops = 0.00001 XLM per base operation).
+ * @param {string} actionName - Gameplay action name
+ * @param {string} walletAddress - Player Stellar address
+ * @param {number} [gasStroops=100] - Gas fee in stroops
+ */
+export function recordGameplayTx(actionName, walletAddress, gasStroops = 100) {
+  if (!walletAddress) return null
+
+  const xlmFee = (gasStroops / 10000000).toFixed(5)
+  sessionSpending.totalGasStroops += gasStroops
+  sessionSpending.txCount += 1
+
+  const entry = {
+    id: `tx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    action: actionName,
+    xlmFee: `${xlmFee} XLM`,
+    timestamp: new Date().toLocaleTimeString(),
+    walletAddress: walletAddress.slice(0, 4) + '…' + walletAddress.slice(-4),
+  }
+
+  sessionSpending.history.unshift(entry)
+  if (sessionSpending.history.length > 20) sessionSpending.history.pop()
+
+  return entry
+}
+
+/**
+ * Get current real-time testnet session spending stats.
+ */
+export function getTestnetSpendingStats() {
+  const totalXlm = (sessionSpending.totalGasStroops / 10000000).toFixed(5)
+  return {
+    totalXlm,
+    txCount: sessionSpending.txCount,
+    history: sessionSpending.history,
+  }
+}
