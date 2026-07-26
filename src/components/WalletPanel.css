@@ -1,0 +1,308 @@
+/* ===== WALLET PANEL ===== */
+
+.wp {
+  background: #1e1b30;
+  border-radius: 12px;
+  padding: 18px 16px 14px;
+  margin-top: 14px;
+  color: #ccc8d8;
+  font-size: 12px;
+}
+
+/* Empty state — not connected */
+.wp-empty {
+  text-align: center;
+  padding: 6px 0 2px;
+}
+
+.wp-icon-ring {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 10px;
+  border: 1.5px solid #5b5375;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.wp-icon {
+  font-size: 18px;
+  color: #9b8fe8;
+}
+
+.wp-label {
+  font: 600 13px 'DM Sans', sans-serif;
+  color: #e8e5f0;
+  margin: 0 0 5px;
+}
+
+.wp-hint {
+  font-size: 10px;
+  color: #7c7892;
+  line-height: 1.55;
+  margin: 0 0 14px;
+}
+
+.wp-connect {
+  width: 100%;
+  border: 1px solid #5b5771;
+  color: #f9f8f0;
+  padding: 11px;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color .15s, color .15s;
+}
+
+.wp-connect:hover {
+  border-color: #d4f16e;
+  color: #d4f16e;
+}
+
+.wp-ext-link {
+  display: block;
+  margin-top: 10px;
+  font-size: 10px;
+  color: #7c7892;
+  text-decoration: none;
+}
+
+.wp-ext-link:hover {
+  color: #b0aac4;
+}
+
+/* Connected state header */
+.wp-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.wp-net-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #74c6a2;
+  box-shadow: 0 0 6px #74c6a2;
+}
+
+.wp-net-label {
+  font: 600 9px 'DM Mono', monospace;
+  letter-spacing: .1em;
+  color: #74c6a2;
+}
+
+.wp-disconnect {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: #68647a;
+  font-size: 13px;
+  padding: 2px 4px;
+}
+
+.wp-disconnect:hover {
+  color: #d98f90;
+}
+
+/* Address row */
+.wp-address-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #16142488;
+  border-radius: 7px;
+  padding: 8px 10px;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: background .12s;
+}
+
+.wp-address-row:hover {
+  background: #1e1b3088;
+}
+
+.wp-addr {
+  font: 11px 'DM Mono', monospace;
+  color: #b8b4c6;
+}
+
+.wp-copy {
+  font-size: 9px;
+  color: #8f82d7;
+  font-weight: 600;
+}
+
+/* Balance area */
+.wp-balance-area {
+  text-align: center;
+  padding: 8px 0 14px;
+}
+
+.wp-balance {
+  font: 700 28px Fraunces, serif;
+  color: #f0eef6;
+  margin: 0;
+  letter-spacing: -.03em;
+}
+
+.wp-balance.wp-zero {
+  color: #68647a;
+}
+
+.wp-unit {
+  font: 10px 'DM Mono', monospace;
+  color: #7c7892;
+  margin: 3px 0 0;
+  letter-spacing: .04em;
+}
+
+/* Fund button */
+.wp-fund {
+  width: 100%;
+  background: linear-gradient(135deg, #8f82d7, #6c5fc7);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: opacity .15s, transform .1s;
+}
+
+.wp-fund:hover:not(:disabled) {
+  opacity: .88;
+  transform: translateY(-1px);
+}
+
+.wp-fund:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.wp-funding {
+  background: #3e395e;
+}
+
+/* Spinner */
+.wp-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff4;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: wp-spin .6s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+@keyframes wp-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Fund result toast */
+.wp-result {
+  margin-top: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  text-align: center;
+  animation: wp-fade-in .2s ease;
+}
+
+.wp-result-ok {
+  background: #1a2e24;
+  color: #74c6a2;
+  border: 1px solid #2a4a37;
+}
+
+.wp-result-err {
+  background: #2e1a1a;
+  color: #d98f90;
+  border: 1px solid #4a2a2a;
+}
+
+@keyframes wp-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+/* Details */
+.wp-details-toggle {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  background: none;
+  border: 0;
+  color: #7c7892;
+  font-size: 10px;
+  padding: 6px 0;
+  text-align: center;
+}
+
+.wp-details-toggle:hover {
+  color: #b0aac4;
+}
+
+.wp-details {
+  margin-top: 4px;
+  border-top: 1px solid #2e2a44;
+  padding-top: 8px;
+}
+
+.wp-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 10px;
+  color: #7c7892;
+  border-bottom: 1px solid #1e1b30;
+}
+
+.wp-detail-row span:last-child {
+  color: #b8b4c6;
+  text-align: right;
+  max-width: 60%;
+}
+
+.wp-mono {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+}
+
+.wp-addr-full {
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.wp-refresh {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  background: none;
+  border: 1px solid #2e2a44;
+  border-radius: 6px;
+  color: #7c7892;
+  padding: 7px;
+  font-size: 10px;
+  transition: border-color .12s, color .12s;
+}
+
+.wp-refresh:hover:not(:disabled) {
+  border-color: #5b5771;
+  color: #b8b4c6;
+}
+
+.wp-refresh:disabled {
+  opacity: .5;
+}
+
+/* Loading state */
+.wp-loading {
+  text-align: center;
+  color: #68647a;
+  font-size: 11px;
+  padding: 10px 0;
+}

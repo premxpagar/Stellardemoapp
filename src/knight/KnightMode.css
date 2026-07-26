@@ -1,0 +1,90 @@
+.knight-mode{position:fixed;inset:0;z-index:100;background:#0a0818;overflow:hidden}
+.knight-mode canvas{display:block;width:100%!important;height:100%!important}
+
+/* HUD */
+.knight-hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:16px 20px;pointer-events:none;z-index:10}
+.knight-hud>*{pointer-events:auto}
+.hud-left{display:flex;flex-direction:column;gap:8px}
+.hud-player-info{display:flex;align-items:center;gap:10px}
+.hud-level{background:#302c48;color:#d9f36d;padding:4px 10px;border-radius:6px;font:700 12px 'DM Mono',monospace;letter-spacing:.05em}
+.hud-hp-bar{width:160px;height:14px;background:#1a1628;border-radius:7px;overflow:hidden;position:relative;border:1px solid #3a3558}
+.hud-hp-fill{height:100%;background:linear-gradient(90deg,#e04848,#e07848);border-radius:7px;transition:width .3s}
+.hud-hp-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:600 9px 'DM Mono',monospace;color:#fff;text-shadow:0 1px 2px #000}
+.hud-companion{display:flex;align-items:center;gap:8px;background:#1a162899;backdrop-filter:blur(6px);border-radius:10px;padding:6px 10px}
+.hud-companion-icon{transform:scale(.35);transform-origin:center;width:40px;height:35px;overflow:hidden}
+.hud-companion-info b{font-size:10px;color:#fff}
+.hud-energy-bar{width:80px;height:5px;background:#1a1628;border-radius:3px;overflow:hidden;margin-top:3px}
+.hud-energy-fill{height:100%;background:#74c6a2;border-radius:3px;transition:width .3s}
+.hud-center{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.hud-area{font:600 11px 'DM Mono',monospace;color:#d9f36d;letter-spacing:.12em;text-shadow:0 1px 4px #000}
+.hud-objective{font:10px 'DM Sans';color:#b8b4c680;text-shadow:0 1px 2px #000}
+.hud-right{display:flex;align-items:center;gap:10px}
+.hud-stardust{font:700 13px 'DM Mono',monospace;color:#d9f36d;text-shadow:0 1px 4px #000}
+.hud-btn{background:#1a162899;backdrop-filter:blur(6px);border:1px solid #3a3558;color:#fff;width:34px;height:34px;border-radius:8px;font-size:16px;display:grid;place-items:center}
+.hud-btn:hover{border-color:#d9f36d;color:#d9f36d}
+
+/* Boss HUD */
+.boss-hud{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);width:min(400px,80%);text-align:center;z-index:10;pointer-events:none}
+.boss-name{font:700 14px Fraunces,serif;color:#e04848;text-shadow:0 0 10px #e0484888;letter-spacing:.05em}
+.boss-hp-bar{width:100%;height:10px;background:#1a1628;border-radius:5px;overflow:hidden;margin:6px 0 3px;border:1px solid #e0484844}
+.boss-hp-fill{height:100%;background:linear-gradient(90deg,#8a1a2e,#e04848);border-radius:5px;transition:width .4s}
+.boss-phase{font:10px 'DM Mono',monospace;color:#e0484888}
+
+/* Loot Popups */
+.loot-popups{position:absolute;right:20px;top:50%;z-index:11;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.loot-popup{background:#1a162899;backdrop-filter:blur(6px);border-radius:8px;padding:8px 14px;font:600 11px 'DM Sans';color:#fff;animation:loot-in .3s ease-out both;border-left:3px solid #9e9bab}
+.loot-common{border-left-color:#9e9bab}
+.loot-uncommon{border-left-color:#5fa87a;color:#a8f0c0}
+.loot-rare{border-left-color:#6c7fd9;color:#a8c4f0}
+.loot-epic{border-left-color:#a364d4;color:#d4a8f0}
+.loot-astral{border-left-color:#d4a832;color:#f0d4a8}
+@keyframes loot-in{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* Overlays */
+.knight-overlay{position:absolute;inset:0;z-index:20;background:#0a081899;backdrop-filter:blur(8px);display:grid;place-items:center}
+.pause-panel,.victory-panel,.world-map-panel{background:#1e1a32;border:1px solid #3a3558;border-radius:16px;padding:30px 40px;text-align:center;color:#f8f7f2;max-width:500px;width:90%}
+.pause-panel h2,.victory-panel h2,.world-map-panel h2{font:700 28px Fraunces,serif;color:#d9f36d;margin:0 0 12px}
+.pause-area{font:11px 'DM Mono',monospace;color:#858198;margin:0 0 16px}
+.pause-stats{display:flex;gap:20px;justify-content:center;margin:0 0 20px;font-size:12px;color:#b8b4c6}
+.pause-panel .primary,.victory-panel .primary{background:#d9f36d;color:#1e1a32;margin-bottom:8px;width:100%}
+.pause-panel .soft-button{width:100%;margin:0;background:#2a2544;border-color:#3a3558;color:#b8b4c6}
+
+/* Victory */
+.victory-title{font-size:22px!important;color:#d9f36d!important}
+.victory-rewards{display:grid;gap:8px;margin:16px 0}
+.victory-reward{background:#2a2544;border-radius:8px;padding:10px;font-size:12px;color:#d4d0e0}
+
+/* World Map */
+.world-map-panel{max-width:550px;position:relative}
+.world-map-graph{display:flex;flex-direction:column;align-items:center;gap:0;margin:20px 0}
+.map-node{background:#2a2544;border:2px solid #3a3558;border-radius:12px;padding:12px 20px;text-align:center;min-width:140px}
+.map-node span{font-size:22px;display:block;margin-bottom:4px}
+.map-node b{font-size:12px;display:block}
+.map-node small{font-size:9px;color:#858198;display:block;margin-top:3px}
+.map-unlocked{border-color:#d9f36d44;background:#2a254488}
+.map-locked{opacity:.45;border-style:dashed}
+.map-connector{width:2px;height:20px;background:#3a3558;margin:0 auto}
+.map-branch{display:flex;gap:30px;justify-content:center}
+.map-arm{display:flex;flex-direction:column;align-items:center}
+
+/* Mobile Controls */
+.mobile-controls{display:none;position:absolute;bottom:20px;left:0;right:0;padding:0 20px;z-index:10;justify-content:space-between;pointer-events:none}
+.mobile-dpad,.mobile-actions{pointer-events:auto}
+.mobile-dpad{position:relative;width:120px;height:120px}
+.dpad-btn{position:absolute;width:40px;height:40px;background:#1a162899;backdrop-filter:blur(4px);border:1px solid #3a3558;border-radius:8px;color:#d9f36d;font-size:16px;display:grid;place-items:center}
+.dpad-up{top:0;left:50%;transform:translateX(-50%)}
+.dpad-down{bottom:0;left:50%;transform:translateX(-50%)}
+.dpad-left{left:0;top:50%;transform:translateY(-50%)}
+.dpad-right{right:0;top:50%;transform:translateY(-50%)}
+.mobile-actions{display:flex;gap:10px;align-items:flex-end}
+.action-btn{width:50px;height:50px;background:#1a162899;backdrop-filter:blur(4px);border:1px solid #3a3558;border-radius:50%;color:#fff;font-size:20px;display:grid;place-items:center}
+.action-attack{background:#e0484833;border-color:#e04848}
+.action-dash{background:#6c7fd933;border-color:#6c7fd9}
+.action-ability{background:#d9f36d33;border-color:#d9f36d}
+
+@media(pointer:coarse),(max-width:800px){.mobile-controls{display:flex}}
+@media(max-width:600px){
+  .knight-hud{padding:8px 10px}
+  .hud-center{display:none}
+  .hud-hp-bar{width:100px}
+}
